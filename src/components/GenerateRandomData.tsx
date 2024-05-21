@@ -1,4 +1,4 @@
-import { Button } from "design-react-kit";
+import { Button, Input } from "design-react-kit";
 import { useState } from "react";
 import DataTable from "./DataTable";
 import { generateItems, fillArray, transposeData } from "../lib/utils";
@@ -36,13 +36,11 @@ function GenerateRandomData({ setData }) {
   }
 
   return (
-    <div className="w-full my-10">
+    <div className="my-10">
       <div>
-        <p>Table</p>
         <span>
-          <p>ROWS:</p>
-          <input
-            className="border-2"
+          <label>ROWS:</label>
+          <Input
             type="number"
             placeholder="rows"
             value={rows}
@@ -50,9 +48,8 @@ function GenerateRandomData({ setData }) {
           />
         </span>
         <span>
-          <p>COLS</p>
-          <input
-            className="border-2"
+          <label>COLS</label>
+          <Input
             type="number"
             placeholder="Cols"
             value={cols}
@@ -62,9 +59,8 @@ function GenerateRandomData({ setData }) {
       </div>
       <div>
         <span>
-          <p> Range Min:</p>
-          <input
-            className="border-2"
+          <label> Range Min:</label>
+          <Input
             type="number"
             placeholder="min"
             value={min}
@@ -72,9 +68,8 @@ function GenerateRandomData({ setData }) {
           />
         </span>
         <span>
-          <p>Range Max:</p>
-          <input
-            className="border-2"
+          <label>Range Max:</label>
+          <Input
             type="number"
             placeholder="Max"
             value={max}
@@ -83,15 +78,15 @@ function GenerateRandomData({ setData }) {
         </span>
       </div>
       <div>
-        <p>Offset</p>
-        <input
+        <label>Offset</label>
+        <Input
           type="number"
           placeholder="offset"
           value={offset}
           onChange={(e) => setOffset(Number.parseInt(e.target.value))}
         />
-        <p>Multiplier</p>
-        <input
+        <label>Multiplier</label>
+        <Input
           type="number"
           step={0.5}
           placeholder="multiplier"
@@ -100,16 +95,19 @@ function GenerateRandomData({ setData }) {
         />
       </div>
 
-      <Button className="btn" onClick={() => generate()}>
-        generate
+      <Button className="my-5 btn btn-primary" onClick={() => generate()}>
+        GENERATE
       </Button>
       {generated && (
         <div className="my-10">
           <div className="w-[500px] overflow-scroll">
             <DataTable data={generated} reset={reset} transpose={transpose} />
           </div>
-          <Button className="btn" onClick={() => setData(generated)}>
-            Use generated data
+          <Button
+            className="btn btn-primary"
+            onClick={() => setData(generated)}
+          >
+            USE GENERATED DATA
           </Button>
         </div>
       )}

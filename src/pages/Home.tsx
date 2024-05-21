@@ -1,4 +1,4 @@
-import { Button, Container } from "design-react-kit";
+import { Button, Col, Container, Row } from "design-react-kit";
 import { useState } from "react";
 import { getAvailablePalettes, getPalette, transposeData } from "../lib/utils";
 import DataTable from "../components/DataTable";
@@ -53,9 +53,8 @@ function Home() {
 
   return (
     <Container>
-      <div className="text-white uppercase">STATE: {state as string}</div>
-      <div className="w-full xl:flex  justify-center">
-        <div className="flex-col bg-gray-50 items-start justify-start">
+      <Row className="border-2">
+        <Col lg="4">
           <div>
             <Button onClick={() => send("GENERATE")}>1 - GENERATE DATA</Button>
             {matches(state, "GENERATE") && (
@@ -103,34 +102,40 @@ function Home() {
               </div>
             )}
           </div>
-        </div>
-        <div className="w-full border-2 overflow-y-scroll bg-white min-h-scr">
-          {state === "TRANSFORM" && rawData && (
-            <div className="bg-gray-50 w-full">
-              <TransformSource setData={setData} rawData={rawData} />
-            </div>
-          )}
+        </Col>
+        <Col lg="8">
+          <div>
+            {state === "TRANSFORM" && rawData && (
+              <div>
+                <TransformSource setData={setData} rawData={rawData} />
+              </div>
+            )}
 
-          {data && data[0] && (
-            <div className="w-full bg-gray-50">
-              <hr />
-              <div className="w-full bg-white xl:m-5 xl:shadow-lg">
-                <center>
-                  <RenderChart chart={chart} data={data} config={config} />
-                </center>
+            {data && data[0] && (
+              <div>
+                <hr />
+                <div className="m-5 shadow-lg">
+                  <center>
+                    <RenderChart chart={chart} data={data} config={config} />
+                  </center>
+                </div>
+                <hr />
+                <div className="overflow-auto  m-5 shadow-lg">
+                  <h1 className="title">Data</h1>
+                  <center>
+                    <DataTable
+                      data={data}
+                      reset={reset}
+                      transpose={transpose}
+                    />
+                  </center>
+                </div>
+                <hr />
               </div>
-              <hr />
-              <div className="overflow-auto w-full bg-white xl:m-5 xl:shadow-lg">
-                <h1 className="title">Data</h1>
-                <center>
-                  <DataTable data={data} reset={reset} transpose={transpose} />
-                </center>
-              </div>
-              <hr />
-            </div>
-          )}
-        </div>
-      </div>
+            )}
+          </div>
+        </Col>
+      </Row>
     </Container>
   );
 }
