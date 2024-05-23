@@ -1,16 +1,11 @@
-import { Button } from "design-react-kit";
+import { Button } from "datocms-react-ui";
 import { useState } from "react";
-
 import axios from "axios";
+import { log } from "../lib/utils";
 
-type LoadSourceProps = {
-  setRawData: (data: any) => void;
-};
-function LoadSource({ setRawData }: LoadSourceProps) {
+function TransformSource({ setRawData }) {
   const [loading, setLoading] = useState(false);
-  const [url, setUrl] = useState(
-    "https://raw.githubusercontent.com/teamdigitale/padigitale2026-opendata/main/data/candidature_altrienti_finanziate.json"
-  );
+  const [url, setUrl] = useState(null);
 
   async function getData() {
     setLoading(true);
@@ -21,33 +16,32 @@ function LoadSource({ setRawData }: LoadSourceProps) {
         setRawData(data);
       }
     } catch (error) {
-      console.log(error);
+      log(error);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="w-full my-10">
+    <div
+      style={{
+        marginTop: 10,
+        marginBottom: 10,
+        width: "100%",
+      }}
+    >
       {loading && <p>Loading...</p>}
       <div>
         <p>Url:</p>
         <input
-          className="border-2"
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />
       </div>
-
-      <Button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => getData()}
-      >
-        fetch data
-      </Button>
+      <Button onClick={() => getData()}>fetch data</Button>
     </div>
   );
 }
 
-export default LoadSource;
+export default TransformSource;

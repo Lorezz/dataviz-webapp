@@ -1,168 +1,119 @@
 import { Button } from "design-react-kit";
 import { useForm } from "react-hook-form";
-import { palettes } from "../lib/constants";
-import { getAvailablePalettes } from "../lib/utils";
-
-function ShowPalette({ palette }) {
-  return (
-    <div className="flex flex-wrap">
-      {palette.map((p, i) => (
-        <div
-          key={i}
-          className="w-4 h-4 m-1 rounded-full"
-          style={{ backgroundColor: p }}
-        ></div>
-      ))}
-    </div>
-  );
-}
+import { palettes, getFields, defaultConfig } from "../lib/constants";
+import { getAvailablePalettes, getMapPalettes } from "../lib/utils";
+import ShowPalette from "./ShowPalette";
 
 function ChartOptions({ config, setConfig, chart, numSeries }) {
-  const availabelPalettes = getAvailablePalettes(numSeries);
+  const availabelPalettes =
+    chart === "map" ? getMapPalettes() : getAvailablePalettes(numSeries);
   const defaultPalette = availabelPalettes[0];
-
+  const fields = getFields(availabelPalettes, defaultPalette);
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm({
+    mode: "onBlur",
     defaultValues: {
-      ...config,
+      ...defaultConfig,
       palette: defaultPalette,
+      ...config,
     },
   });
-
-  const watchPalette = watch("palette", defaultPalette);
-
-  const fields = [
-    {
-      label: "Chart palette",
-      name: "palette",
-      type: "select",
-      options: availabelPalettes,
-      otherProps: {},
-      required: false,
-      chartType: ["bar", "line", "pie", "geo"],
-      defaultValue: defaultPalette,
-    },
-    {
-      label: "Chart Height",
-      name: "h",
-      type: "number",
-      options: [],
-      otherProps: {
-        step: 10,
-      },
-      required: false,
-      chartType: ["bar", "line", "pie", "geo"],
-    },
-    {
-      label: "Chart Width",
-      name: "w",
-      type: "number",
-      options: [],
-      otherProps: {
-        step: 10,
-      },
-      required: false,
-      chartType: ["bar", "line", "pie", "geo"],
-    },
-    {
-      label: "Show Legend",
-      name: "legend",
-      type: "checkbox",
-      options: [],
-      required: false,
-      chartType: ["bar", "line", "pie", "geo"],
-      otherProps: {},
-    },
-    {
-      label: "Show tooltip",
-      name: "tooltip",
-      type: "checkbox",
-      options: [],
-      required: false,
-      chartType: ["bar", "line", "pie", "geo"],
-      otherProps: {},
-    },
-    {
-      label: "Cross Pointer",
-      name: "axisPointer",
-      type: "select",
-      options: ["line", "cross", "shadow", "none"],
-      required: false,
-      chartType: ["bar", "line"],
-      otherProps: {},
-    },
-    {
-      label: "Data Zoom",
-      name: "zoom",
-      type: "select",
-      options: ["none", "inside", "slider"],
-      required: false,
-      chartType: ["bar", "line", "pie", "geo"],
-      otherProps: {},
-    },
-    {
-      label: "Direction",
-      name: "direction",
-      type: "select",
-      options: ["vertical", "horizontal"],
-      otherProps: {},
-      required: false,
-      placeholder: "Chart Direction",
-      chartType: ["bar", "line"],
-    },
-    {
-      label: "Smooth Lines",
-      name: "smooth",
-      type: "checkbox",
-      options: [],
-      required: false,
-      chartType: ["line"],
-      otherProps: {},
-    },
-  ];
+  const watchPalette = watch("palette", config?.palette || defaultPalette);
+  const watchDirection = watch("direction", null);
+  const watchToltip = watch("tooltip", true);
+  const watchLegend = watch("legend", true);
+  const watchShowPieLabels = watch("showPieLabels", true);
+  const watchVisualMap = watch("visualMap", true);
 
   const onSubmit = (data) => {
-    console.log(data);
     const { h, w, palette, ...rest } = data;
     const colors = palettes[palette];
-    console.log(palette, "colors", colors);
-    const newConfig = { h: Number(h), w: Number(w), ...rest, colors };
-    console.log("newConfig", newConfig);
+    const newConfig = { h: Number(h), w: Number(w), ...rest, colors, palette };
     setConfig(newConfig);
   };
   if (!chart) {
-    return <div my-10>Please choose a chart type</div>;
+    return <div className="my-5">Please choose a chart type</div>;
+  }
+
+  let filteredFields = fields.filter((field) =>
+    field.chartType.includes(chart)
+  );
+  if (!watchToltip) {
+    filteredFields = filteredFields.filter(
+      (field) => field.dependsOn !== "tooltip"
+    );
+  }
+  if (!watchLegend) {
+    filteredFields = filteredFields.filter(
+      (field) => field.dependsOn !== "legend"
+    );
+  }
+  if (!watchShowPieLabels) {
+    filteredFields = filteredFields.filter(
+      (field) => field.dependsOn !== "showPieLabels"
+    );
+  }
+  if (!watchVisualMap) {
+    filteredFields = filteredFields.filter(
+      (field) => field.dependsOn !== "visualMap"
+    );
   }
   return (
-    <div className="w-full my-10">
-      {watchPalette && <ShowPalette palette={palettes[watchPalette]} />}
+    <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {fields
-          .filter((field) => field.chartType.includes(chart))
-          .map((field) => {
-            if (["text", "email", "number"].includes(field.type)) {
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gridGap: 10,
+            fontSize: 14,
+          }}
+        >
+          {filteredFields.map((field) => {
+            if (["text", "email", "number", "color"].includes(field.type)) {
+              let style = {};
+              if (field.layout) {
+                style = { gridColumn: `span ${field.layout}` };
+              }
+              let label = field.label;
+              if (
+                (field.name === "xLabel" || field.name === "yLabel") &&
+                watchDirection === "horizontal"
+              ) {
+                label =
+                  field.name === "xLabel"
+                    ? field.label.replace("X", "Y")
+                    : field.label.replace("Y", "X");
+              }
               return (
-                <div className="my-2 grid grid-cols-2 gap-2" key={field.name}>
-                  <label>{field.label}</label>
-                  <input
-                    type={field.type}
-                    {...register(field.name, { required: field.required })}
-                    {...field.otherProps}
-                  />
+                <div key={field.name} style={style}>
+                  <label>{label}</label>
+                  <div>
+                    <input
+                      type={field.type}
+                      {...field.otherProps}
+                      {...register(field.name, { required: field.required })}
+                    />
+                  </div>
                   {errors[field.name] && <span>This field is required</span>}
                 </div>
               );
             } else if (["checkbox"].includes(field.type)) {
+              let style = {};
+              if (field.layout) {
+                style = { gridColumn: `span ${field.layout}` };
+              }
               return (
-                <div className="my-2 grid grid-cols-2 gap-2" key={field.name}>
+                <div key={field.name} style={style}>
                   <label>{field.label}</label>
-                  <div className="px-4">
+                  <div>
                     <input
                       type="checkbox"
+                      {...field.otherProps}
                       {...register(field.name, { required: field.required })}
                     />
                   </div>
@@ -170,10 +121,17 @@ function ChartOptions({ config, setConfig, chart, numSeries }) {
                 </div>
               );
             } else if (["select"].includes(field.type)) {
+              let style = {};
+              if (field.layout) {
+                style = { gridColumn: `span ${field.layout}` };
+              }
               return (
-                <div className="my-2 grid grid-cols-2 gap-2" key={field.name}>
-                  <label>{field.label}</label>
+                <div key={field.name} style={style}>
+                  <div>{field.label}</div>
                   <select
+                    className="my-2 p-2"
+                    style={{ width: "80%" }}
+                    {...field.otherProps}
                     {...register(field.name, { required: field.required })}
                   >
                     {field.options.map((option) => {
@@ -185,14 +143,40 @@ function ChartOptions({ config, setConfig, chart, numSeries }) {
                     })}
                   </select>
                   {errors[field.name] && <span>This field is required</span>}
+                  {field.name === "palette" && watchPalette && (
+                    <>
+                      <ShowPalette palette={palettes[watchPalette]} />
+                    </>
+                  )}
                 </div>
               );
             } else {
-              return <div>{field.name}</div>;
+              let style = {
+                marginTop: 10,
+                gridColumn: "span 3",
+                fontWeight: "bold",
+                fontSize: 16,
+              };
+              return (
+                <>
+                  <div style={style}>
+                    <span
+                      style={{
+                        padding: 5,
+                        backgroundColor: "#eee",
+                        borderRadius: 5,
+                      }}
+                    >
+                      {field.name}
+                    </span>
+                  </div>
+                </>
+              );
             }
           })}
-        <div className="my-2">
-          <input type="submit" value="Submit" className="btn" />
+        </div>
+        <div className="mt-5">
+          <Button type="submit">Applica</Button>
         </div>
       </form>
     </div>

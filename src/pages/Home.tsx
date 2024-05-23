@@ -113,24 +113,12 @@ function Home() {
 
             {data && data[0] && (
               <div>
-                <hr />
                 <div className="m-5 shadow-lg">
                   <center>
                     <RenderChart chart={chart} data={data} config={config} />
                   </center>
                 </div>
-                <hr />
-                <div className="overflow-auto  m-5 shadow-lg">
-                  <h1 className="title">Data</h1>
-                  <center>
-                    <DataTable
-                      data={data}
-                      reset={reset}
-                      transpose={transpose}
-                    />
-                  </center>
-                </div>
-                <hr />
+                <DataTable data={data} reset={reset} transpose={transpose} />
               </div>
             )}
           </div>

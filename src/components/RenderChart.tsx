@@ -1,48 +1,56 @@
-import { useEffect, useState } from "react";
 import BasicChart from "./charts/BasicChart";
 import PieChart from "./charts/PieChart";
-import {
-  toDataSource,
-  getPieValues,
-  getLineValues,
-  getBarValues,
-} from "../lib/utils";
+import GeoMapChart from "./charts/GeoMapChart";
+import { getPieValues, getBasicValues, getMapValues } from "../lib/utils";
+import { useEffect, useState, useRef } from "react";
 
-function RenderChart({ chart, data, config }) {
-  function transformData(d, cfg) {
-    if (!d) return null;
-    return toDataSource(d, cfg);
+function RenderChart({ ds, config }) {
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, [config]);
+
+  const wrapRef = useRef(null);
+  const [width, setWidth] = useState(null);
+  const isMobile = width && width <= 480;
+
+  function setDimension() {
+    setWidth(wrapRef?.current?.clientWidth);
   }
-
-  const [currentValue, setCurrentValue] = useState(transformData(data, config));
 
   useEffect(() => {
-    if (chart && data && config) {
-      setCurrentValue(transformData(data, config));
-    }
-  }, [chart, data, config]);
+    window.addEventListener("resize", setDimension);
+    setDimension();
+    return () => {
+      window.removeEventListener("resize", setDimension);
+    };
+  }, []);
 
-  if (currentValue) {
-    const formatted =
-      chart === "bar"
-        ? getBarValues(currentValue)
-        : chart === "line"
-        ? getLineValues(currentValue)
-        : chart === "pie"
-        ? getPieValues(currentValue)
-        : null;
-  }
+  if (loading) return null;
   return (
     <div className="w-full min-height-[800px]">
-      {currentValue?.dataSource && (
-        <>
-          {chart === "bar" && <BasicChart data={getBarValues(currentValue)} />}
-          {chart === "line" && (
-            <BasicChart data={getLineValues(currentValue)} />
-          )}
-          {chart === "pie" && <PieChart data={getPieValues(currentValue)} />}
-        </>
-      )}
+      <div ref={wrapRef}>
+        {ds && (
+          <>
+            {(ds.chart === "bar" || ds.chart === "line") && (
+              <BasicChart data={getBasicValues(ds)} isMobile={isMobile} />
+            )}
+            {ds.chart === "pie" && (
+              <PieChart data={getPieValues(ds)} isMobile={isMobile} />
+            )}
+            {ds.chart === "map" && (
+              <GeoMapChart
+                data={getMapValues(ds)}
+                id="sample"
+                isMobile={isMobile}
+              />
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
