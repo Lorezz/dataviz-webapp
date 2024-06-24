@@ -105,8 +105,8 @@ function UploadCSV({ setData }) {
 
   function handleChangeSerie(options: string[]) {
     console.log("newValues", options);
-    const series = getCols(rawData[0]).filter((i) =>
-      options.map((o) => o.value).includes(i.value)
+    const series = getCols(rawData[0]).filter((i: any) =>
+      options.map((o) => o).includes(i.value)
     );
     setSeries(series);
   }

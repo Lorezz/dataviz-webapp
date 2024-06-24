@@ -11,7 +11,7 @@ import { MatrixType } from "../types";
 import { useState, useEffect } from "react";
 import { Container, Row } from "design-react-kit";
 
-export default function ChartEditor({ ctx }:) {
+export default function ChartEditor({ ctx }) {
   const currentValue = JSON.parse(ctx.formValues[ctx.fieldPath] as string) || {
     config: {},
   };
@@ -99,10 +99,7 @@ export default function ChartEditor({ ctx }:) {
   return (
     <Container>
       <Row>
-        <div
-          title="Dati"
-
-        >
+        <div title="Dati">
           <div style={{ margin: "0 20px 20px" }}>
             <CSVUpload setData={(d) => handleUploadData(d)} />
             {hasData && (
@@ -120,10 +117,7 @@ export default function ChartEditor({ ctx }:) {
         </div>
 
         {hasData && (
-          <div
-            title="Tipologia grafico"
-
-          >
+          <div title="Tipologia grafico">
             <div style={{ margin: "0 20px 20px" }}>
               <SelectChart chart={chart} setChart={setChart} />
             </div>
@@ -131,10 +125,7 @@ export default function ChartEditor({ ctx }:) {
         )}
 
         {hasData && chart && (
-          <div
-            title="Configurazioni grafico"
-
-          >
+          <div title="Configurazioni grafico">
             <div style={{ margin: "0 20px 20px" }}>
               <ChartOptions
                 config={config}
@@ -152,7 +143,7 @@ export default function ChartEditor({ ctx }:) {
           currentValue.data[0] && (
             <div style={{ marginTop: 20 }}>
               <center>
-                <RenderChart ds={currentValue} config={config} />
+                <RenderChart ds={currentValue} />
               </center>
             </div>
           )}

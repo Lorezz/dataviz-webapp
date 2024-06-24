@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import * as echarts from "echarts";
 import ReactEcharts from "echarts-for-react";
 import { useForm } from "react-hook-form";
-import { Button } from "datocms-react-ui";
+import { Button } from "design-react-kit";
 
 import DataTable from "./DataTable";
 import { transposeData } from "../lib/utils";
@@ -206,9 +206,7 @@ export default function CheckGeo() {
               {errors["geoJsonUrl"] && <span>This field is required</span>}
             </div>
             <div className="ml-5">
-              <Button buttonSize="xxs" type="submit">
-                Load Geo Json
-              </Button>
+              <Button type="submit">Load Geo Json</Button>
             </div>
           </div>
         </form>
@@ -243,8 +241,6 @@ export default function CheckGeo() {
                   <div key={key + "_matches"}>
                     {matches.map(({ name, numMatches }) => (
                       <Button
-                        buttonType="muted"
-                        buttonSize="xxs"
                         key={key + "_" + name}
                         onClick={() => setPropertyName(name)}
                       >

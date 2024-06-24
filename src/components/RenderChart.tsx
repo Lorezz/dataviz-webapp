@@ -4,14 +4,14 @@ import GeoMapChart from "./charts/GeoMapChart";
 import { getPieValues, getBasicValues, getMapValues } from "../lib/utils";
 import { useEffect, useState, useRef } from "react";
 
-function RenderChart({ ds, config }) {
+function RenderChart({ ds }: any) {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 1000);
-  }, [config]);
+  }, [ds.config]);
 
   const wrapRef = useRef(null);
   const [width, setWidth] = useState(null);
