@@ -1,10 +1,10 @@
 import { useState, useTransition } from "react";
 import Papa from "papaparse";
 import DataTable from "./DataTable";
-import { Button, SelectField } from "datocms-react-ui";
+import { Button, Select } from "design-react-kit";
 
 import { log, transposeData, moveDataColumn } from "../lib/utils";
-import { MatrixType } from "../sharedTypes";
+import { MatrixType } from "../types";
 
 type selectOptionType = {
   value: string;
@@ -96,10 +96,19 @@ function UploadCSV({ setData }) {
     return filtered;
   }
 
-  function handleChangeCategory(newValue: any) {
+  function handleChangeCategory(newValue: string) {
     setSeries([]);
-    setCategory(newValue);
-    setRawData(moveDataColumn(rawData, newValue.value));
+    const category = getCols(rawData[0]).find((i) => i.value === newValue);
+    setCategory(category);
+    setRawData(moveDataColumn(rawData, newValue));
+  }
+
+  function handleChangeSerie(options: string[]) {
+    console.log("newValues", options);
+    const series = getCols(rawData[0]).filter((i) =>
+      options.map((o) => o.value).includes(i.value)
+    );
+    setSeries(series);
   }
 
   return (
@@ -120,32 +129,42 @@ function UploadCSV({ setData }) {
             transpose={() => transpose()}
             reset={() => setRawData(null)}
           />
-          <SelectField
+          <label>Seleziona la colonna categoria:</label>
+          <select
             name="category"
             id="category"
-            label="category"
-            hint="Selezione la colonna categoria"
-            value={category}
-            selectInputProps={{
-              options: getCols(rawData[0]),
-            }}
-            onChange={(newValue) => handleChangeCategory(newValue)}
-          />
+            // label="category"
+            // hint="Selezione la colonna categoria"
+            value={category?.value}
+            onChange={(e) => handleChangeCategory(e.target.value)}
+          >
+            {getCols(rawData[0]).map((col) => (
+              <option key={col.value} value={col.value}>
+                {col.value}
+              </option>
+            ))}
+          </select>
           {category && (
-            <SelectField
-              name="series"
-              id="series"
-              label="series"
-              hint="Seleziona una o più serie"
-              value={series}
-              selectInputProps={{
-                isMulti: true,
-                options: getCols(rawData[0]).filter(
-                  (i) => !isSameObject(i, category)
-                ),
-              }}
-              onChange={(newValue: selectOptionType[]) => setSeries(newValue)}
-            />
+            <>
+              <label>Seleziona una o più serie:</label>
+              <select
+                name="series"
+                id="series"
+                // label="series"
+                // hint="Seleziona una o più serie"
+                multiple={true}
+                value={series.map((s) => s.value).join(",")}
+                onChange={(e) => handleChangeSerie(e.target.value.split(","))}
+              >
+                {getCols(rawData[0])
+                  .filter((i) => !isSameObject(i, category))
+                  .map((col) => (
+                    <option key={col.value} value={col.value}>
+                      {col.value}
+                    </option>
+                  ))}
+              </select>
+            </>
           )}
 
           <div>

@@ -1,4 +1,4 @@
-import { Button } from "datocms-react-ui";
+import { Button } from "design-react-kit";
 import { useState } from "react";
 import axios from "axios";
 import { log } from "../lib/utils";
